@@ -1,0 +1,15 @@
+namespace PrismLauncherWinUI3
+{
+    [default_interface]
+    runtimeclass CreateInstanceDialog : Microsoft.UI.Xaml.Controls.ContentDialog
+    {
+        CreateInstanceDialog();
+        String InstanceName{ get; };
+        String Version{ get; };
+        String Group{ get; };
+        String IconKey{ get; };
+        Boolean CreateWorld{ get; };
+        Boolean InstallForge{ get; };
+        Boolean InstallFabric{ get; };
+    }
+}

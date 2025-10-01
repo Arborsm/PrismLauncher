@@ -31,6 +31,7 @@ set(SOURCES
     src/App.xaml.h
     src/App.idl
     src/MainWindow.idl
+    src/pch.h
     src/bridge/PrismLauncherBridge.h
     src/bridge/PrismLauncherBridge.cpp
     src/bridge/InstanceWrapper.h
@@ -39,6 +40,12 @@ set(SOURCES
     src/bridge/InstanceListWrapper.cpp
     src/core/PrismCore.h
     src/core/PrismCore.cpp
+    src/Models/InstanceModel.h
+    src/Models/InstanceModel.cpp
+    src/Converters/BooleanToVisibilityConverter.h
+    src/Converters/BooleanToVisibilityConverter.cpp
+    src/Converters/NullToVisibilityConverter.h
+    src/Converters/NullToVisibilityConverter.cpp
 )
 
 # 创建可执行文件

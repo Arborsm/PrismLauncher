@@ -4,19 +4,23 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="using:Microsoft.UI.Xaml.Controls"
     xmlns:media="using:Microsoft.UI.Xaml.Media"
+    xmlns:converters="using:PrismLauncherWinUI3.Converters"
+    xmlns:models="using:PrismLauncherWinUI3.Models"
     Title="Prism Launcher"
     MinWidth="1200"
-    MinHeight="800">
+    MinHeight="800"
+    Background="{StaticResource PrismBackgroundBrush}">
 
-    <Grid Background="{StaticResource PrismBackgroundBrush}">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- 标题栏 -->
-        <Grid Grid.Row="0" Height="48" Background="{StaticResource PrismSurfaceBrush}">
+        <!-- 现代化标题栏 -->
+        <Grid Grid.Row="0" Height="56" Background="{StaticResource PrismSurfaceBrush}" 
+              BorderBrush="{StaticResource PrismDividerBrush}" BorderThickness="0,0,0,1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
@@ -24,103 +28,169 @@
             </Grid.ColumnDefinitions>
 
             <!-- Logo和标题 -->
-            <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="16,0,0,0" VerticalAlignment="Center">
-                <FontIcon Glyph="&#xE7FC;" FontSize="24" Foreground="{StaticResource PrismAccentBrush}"/>
-                <TextBlock Text="Prism Launcher" FontSize="18" FontWeight="SemiBold" 
-                           Foreground="White" Margin="8,0,0,0" VerticalAlignment="Center"/>
+            <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="24,0,0,0" VerticalAlignment="Center">
+                <Border Width="32" Height="32" Background="{StaticResource PrismAccentBrush}" 
+                        CornerRadius="{StaticResource PrismCornerRadiusM}">
+                    <FontIcon Glyph="&#xE7FC;" FontSize="20" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Border>
+                <TextBlock Text="Prism Launcher" Style="{StaticResource PrismTitleTextStyle}" 
+                           FontSize="20" Margin="12,0,0,0" VerticalAlignment="Center"/>
             </StackPanel>
 
             <!-- 搜索框 -->
             <AutoSuggestBox Grid.Column="1" PlaceholderText="搜索实例..." 
-                           Width="300" HorizontalAlignment="Center" VerticalAlignment="Center"
-                           Background="{StaticResource PrismCardBrush}" BorderBrush="{StaticResource PrismAccentBrush}"/>
+                           Width="400" HorizontalAlignment="Center" VerticalAlignment="Center"
+                           Background="{StaticResource PrismCardBrush}" 
+                           BorderBrush="{StaticResource PrismBorderBrush}"
+                           CornerRadius="{StaticResource PrismCornerRadiusM}"
+                           Margin="0,0,16,0">
+                <AutoSuggestBox.Resources>
+                    <Style TargetType="TextBox">
+                        <Setter Property="Background" Value="Transparent"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="Foreground" Value="{StaticResource PrismTextPrimaryBrush}"/>
+                        <Setter Property="FontFamily" Value="{StaticResource PrismFontFamily}"/>
+                        <Setter Property="FontSize" Value="{StaticResource PrismFontSizeMedium}"/>
+                    </Style>
+                </AutoSuggestBox.Resources>
+            </AutoSuggestBox>
 
             <!-- 操作按钮 -->
-            <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="0,0,16,0" VerticalAlignment="Center">
-                <Button x:Name="AddInstanceButton" Content="添加实例" Style="{StaticResource AccentButtonStyle}" 
-                        Margin="0,0,8,0" Click="AddInstance_Click"/>
-                <Button x:Name="SettingsButton" Content="设置" Click="Settings_Click"/>
+            <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="0,0,24,0" VerticalAlignment="Center">
+                <Button x:Name="AddInstanceButton" Content="添加实例" 
+                        Style="{StaticResource PrismPrimaryButtonStyle}" 
+                        Margin="0,0,8,0" Click="AddInstance_Click">
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal">
+                            <FontIcon Glyph="&#xE710;" FontSize="16" Margin="0,0,6,0"/>
+                            <TextBlock Text="添加实例"/>
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+                <Button x:Name="SettingsButton" Content="设置" 
+                        Style="{StaticResource PrismSecondaryButtonStyle}" 
+                        Click="Settings_Click">
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal">
+                            <FontIcon Glyph="&#xE713;" FontSize="16" Margin="0,0,6,0"/>
+                            <TextBlock Text="设置"/>
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
             </StackPanel>
         </Grid>
 
         <!-- 主内容区域 -->
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="280"/>
+                <ColumnDefinition Width="320"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- 侧边栏 -->
-            <Grid Grid.Column="0" Background="{StaticResource PrismSurfaceBrush}" Margin="0,0,1,0">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
+            <!-- 现代化侧边栏 -->
+            <Border Grid.Column="0" Background="{StaticResource PrismSurfaceBrush}" 
+                    BorderBrush="{StaticResource PrismDividerBrush}" BorderThickness="0,0,1,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
 
-                <!-- 分组和筛选 -->
-                <StackPanel Grid.Row="0" Margin="16,16,16,8">
-                    <TextBlock Text="分组" FontWeight="SemiBold" FontSize="14" Foreground="White" Margin="0,0,0,8"/>
-                    <ComboBox x:Name="GroupComboBox" PlaceholderText="所有分组" 
-                             Background="{StaticResource PrismCardBrush}" BorderBrush="{StaticResource PrismAccentBrush}"/>
-                    
-                    <TextBlock Text="状态" FontWeight="SemiBold" FontSize="14" Foreground="White" 
-                               Margin="0,16,0,8"/>
-                    <StackPanel>
-                        <CheckBox x:Name="ShowRunningCheckBox" Content="正在运行" Foreground="White" 
-                                  IsChecked="True" Margin="0,0,0,4"/>
-                        <CheckBox x:Name="ShowOfflineCheckBox" Content="离线" Foreground="White" 
-                                  IsChecked="True" Margin="0,0,0,4"/>
-                        <CheckBox x:Name="ShowBrokenCheckBox" Content="已损坏" Foreground="White" 
-                                  IsChecked="False" Margin="0,0,0,4"/>
-                    </StackPanel>
-                </StackPanel>
+                    <!-- 筛选和分组 -->
+                    <Border Grid.Row="0" Background="{StaticResource PrismCardBrush}" 
+                            CornerRadius="0,0,0,0" Padding="20,20,20,16" Margin="0,0,0,1">
+                        <StackPanel>
+                            <TextBlock Text="筛选" Style="{StaticResource PrismSubtitleTextStyle}" 
+                                       Margin="0,0,0,12"/>
+                            
+                            <ComboBox x:Name="GroupComboBox" PlaceholderText="所有分组" 
+                                     Background="{StaticResource PrismElevatedBrush}" 
+                                     BorderBrush="{StaticResource PrismBorderBrush}"
+                                     CornerRadius="{StaticResource PrismCornerRadiusS}"
+                                     Margin="0,0,0,16">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding}" Foreground="{StaticResource PrismTextPrimaryBrush}"/>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                            
+                            <TextBlock Text="状态" Style="{StaticResource PrismSubtitleTextStyle}" 
+                                       Margin="0,0,0,8"/>
+                            
+                            <StackPanel>
+                                <CheckBox x:Name="ShowRunningCheckBox" Content="正在运行" 
+                                          Foreground="{StaticResource PrismTextPrimaryBrush}" 
+                                          IsChecked="True" Margin="0,0,0,6"/>
+                                <CheckBox x:Name="ShowOfflineCheckBox" Content="离线" 
+                                          Foreground="{StaticResource PrismTextPrimaryBrush}" 
+                                          IsChecked="True" Margin="0,0,0,6"/>
+                                <CheckBox x:Name="ShowBrokenCheckBox" Content="已损坏" 
+                                          Foreground="{StaticResource PrismTextPrimaryBrush}" 
+                                          IsChecked="False" Margin="0,0,0,6"/>
+                                <CheckBox x:Name="ShowUpdatedCheckBox" Content="有更新" 
+                                          Foreground="{StaticResource PrismTextPrimaryBrush}" 
+                                          IsChecked="True"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
 
-                <!-- 实例列表 -->
-                <ScrollViewer Grid.Row="1" Margin="16,0,16,16">
-                    <ListView x:Name="InstanceListView" 
-                             Background="Transparent" 
-                             SelectionMode="Single"
-                             ItemClick="InstanceListView_ItemClick">
-                        <ListView.ItemTemplate>
-                            <DataTemplate>
-                                <Grid Height="80" Background="{StaticResource PrismCardBrush}" 
-                                      Margin="0,0,0,8" CornerRadius="8" Padding="12">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
+                    <!-- 实例列表 -->
+                    <ScrollViewer Grid.Row="1" Margin="20,0,20,20" VerticalScrollBarVisibility="Auto">
+                        <ListView x:Name="InstanceListView" 
+                                 Background="Transparent" 
+                                 SelectionMode="Single"
+                                 ItemClick="InstanceListView_ItemClick"
+                                 ItemsSource="{x:Bind InstanceModels, Mode=OneWay}">
+                            <ListView.ItemTemplate>
+                                <DataTemplate x:DataType="models:InstanceModel">
+                                    <Border Style="{StaticResource PrismInstanceCardStyle}">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
 
-                                    <!-- 实例图标 -->
-                                    <Border Grid.Column="0" Width="48" Height="48" 
-                                           Background="{StaticResource PrismAccentBrush}" 
-                                           CornerRadius="8" Margin="0,0,12,0">
-                                        <FontIcon Glyph="&#xE7FC;" FontSize="24" Foreground="White"/>
+                                            <!-- 实例图标 -->
+                                            <Border Grid.Column="0" Width="48" Height="48" 
+                                                   Background="{Binding IconBrush}" 
+                                                   CornerRadius="{StaticResource PrismCornerRadiusM}" 
+                                                   Margin="0,0,16,0">
+                                                <FontIcon Glyph="&#xE7FC;" FontSize="24" 
+                                                          Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+
+                                            <!-- 实例信息 -->
+                                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding Name}" 
+                                                           Style="{StaticResource PrismSubtitleTextStyle}" 
+                                                           TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Text="{Binding Version}" 
+                                                           Style="{StaticResource PrismCaptionTextStyle}" 
+                                                           Margin="0,2,0,0"/>
+                                                <TextBlock Text="{Binding LastPlayed}" 
+                                                           Style="{StaticResource PrismCaptionTextStyle}" 
+                                                           Margin="0,2,0,0"/>
+                                            </StackPanel>
+
+                                            <!-- 状态指示器 -->
+                                            <StackPanel Grid.Column="2" VerticalAlignment="Center" Spacing="4">
+                                                <Ellipse Width="8" Height="8" Fill="{Binding StatusBrush}" 
+                                                        Visibility="{Binding IsRunning, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                                <Ellipse Width="8" Height="8" Fill="{StaticResource PrismErrorBrush}" 
+                                                        Visibility="{Binding IsBroken, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                                <Ellipse Width="8" Height="8" Fill="{StaticResource PrismWarningBrush}" 
+                                                        Visibility="{Binding HasUpdate, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                            </StackPanel>
+                                        </Grid>
                                     </Border>
-
-                                    <!-- 实例信息 -->
-                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" 
-                                                   FontSize="16" Foreground="White" TextTrimming="CharacterEllipsis"/>
-                                        <TextBlock Text="{Binding Version}" FontSize="12" 
-                                                   Foreground="LightGray" Margin="0,2,0,0"/>
-                                        <TextBlock Text="{Binding LastPlayed}" FontSize="11" 
-                                                   Foreground="Gray" Margin="0,2,0,0"/>
-                                    </StackPanel>
-
-                                    <!-- 状态指示器 -->
-                                    <StackPanel Grid.Column="2" VerticalAlignment="Center">
-                                        <Ellipse Width="8" Height="8" Fill="Green" 
-                                                Visibility="{Binding IsRunning, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                                        <Ellipse Width="8" Height="8" Fill="Red" 
-                                                Visibility="{Binding IsBroken, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                                    </StackPanel>
-                                </Grid>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
-                </ScrollViewer>
-            </Grid>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
 
             <!-- 主内容区域 -->
             <Grid Grid.Column="1" Background="{StaticResource PrismBackgroundBrush}">
@@ -130,39 +200,95 @@
                 </Grid.RowDefinitions>
 
                 <!-- 选中实例的工具栏 -->
-                <Grid Grid.Row="0" Height="60" Background="{StaticResource PrismSurfaceBrush}" 
-                      Margin="0,0,0,1" Visibility="{Binding SelectedInstance, Converter={StaticResource NullToVisibilityConverter}}">
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="16,0">
-                        <Button x:Name="LaunchButton" Content="启动" Style="{StaticResource AccentButtonStyle}" 
-                                Margin="0,0,8,0" Click="Launch_Click"/>
-                        <Button x:Name="EditButton" Content="编辑" Margin="0,0,8,0" Click="Edit_Click"/>
-                        <Button x:Name="CopyButton" Content="复制" Margin="0,0,8,0" Click="Copy_Click"/>
-                        <Button x:Name="DeleteButton" Content="删除" Margin="0,0,8,0" Click="Delete_Click"/>
-                        <Button x:Name="ExportButton" Content="导出" Click="Export_Click"/>
+                <Border Grid.Row="0" Height="64" Background="{StaticResource PrismSurfaceBrush}" 
+                        BorderBrush="{StaticResource PrismDividerBrush}" BorderThickness="0,0,0,1"
+                        Visibility="{Binding SelectedInstance, Converter={StaticResource NullToVisibilityConverter}}">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="24,0">
+                        <Button x:Name="LaunchButton" Content="启动" 
+                                Style="{StaticResource PrismPrimaryButtonStyle}" 
+                                Margin="0,0,8,0" Click="Launch_Click">
+                            <Button.Content>
+                                <StackPanel Orientation="Horizontal">
+                                    <FontIcon Glyph="&#xE768;" FontSize="16" Margin="0,0,6,0"/>
+                                    <TextBlock Text="启动"/>
+                                </StackPanel>
+                            </Button.Content>
+                        </Button>
+                        <Button x:Name="EditButton" Content="编辑" 
+                                Style="{StaticResource PrismSecondaryButtonStyle}" 
+                                Margin="0,0,8,0" Click="Edit_Click">
+                            <Button.Content>
+                                <StackPanel Orientation="Horizontal">
+                                    <FontIcon Glyph="&#xE70F;" FontSize="16" Margin="0,0,6,0"/>
+                                    <TextBlock Text="编辑"/>
+                                </StackPanel>
+                            </Button.Content>
+                        </Button>
+                        <Button x:Name="CopyButton" Content="复制" 
+                                Style="{StaticResource PrismSecondaryButtonStyle}" 
+                                Margin="0,0,8,0" Click="Copy_Click">
+                            <Button.Content>
+                                <StackPanel Orientation="Horizontal">
+                                    <FontIcon Glyph="&#xE8C8;" FontSize="16" Margin="0,0,6,0"/>
+                                    <TextBlock Text="复制"/>
+                                </StackPanel>
+                            </Button.Content>
+                        </Button>
+                        <Button x:Name="DeleteButton" Content="删除" 
+                                Style="{StaticResource PrismSecondaryButtonStyle}" 
+                                Margin="0,0,8,0" Click="Delete_Click">
+                            <Button.Content>
+                                <StackPanel Orientation="Horizontal">
+                                    <FontIcon Glyph="&#xE74D;" FontSize="16" Margin="0,0,6,0"/>
+                                    <TextBlock Text="删除"/>
+                                </StackPanel>
+                            </Button.Content>
+                        </Button>
+                        <Button x:Name="ExportButton" Content="导出" 
+                                Style="{StaticResource PrismSecondaryButtonStyle}" 
+                                Click="Export_Click">
+                            <Button.Content>
+                                <StackPanel Orientation="Horizontal">
+                                    <FontIcon Glyph="&#xE792;" FontSize="16" Margin="0,0,6,0"/>
+                                    <TextBlock Text="导出"/>
+                                </StackPanel>
+                            </Button.Content>
+                        </Button>
                     </StackPanel>
-                </Grid>
+                </Border>
 
-                <!-- 实例详情或欢迎页面 -->
+                <!-- 内容区域 -->
                 <Grid Grid.Row="1">
                     <!-- 欢迎页面 -->
                     <StackPanel x:Name="WelcomePanel" VerticalAlignment="Center" HorizontalAlignment="Center">
-                        <FontIcon Glyph="&#xE7FC;" FontSize="64" Foreground="{StaticResource PrismAccentBrush}" 
-                                  HorizontalAlignment="Center" Margin="0,0,0,16"/>
-                        <TextBlock Text="欢迎使用 Prism Launcher" FontSize="24" FontWeight="SemiBold" 
-                                   Foreground="White" HorizontalAlignment="Center" Margin="0,0,0,8"/>
-                        <TextBlock Text="选择一个实例开始游戏，或创建新实例" FontSize="14" 
-                                   Foreground="LightGray" HorizontalAlignment="Center" Margin="0,0,0,24"/>
+                        <Border Width="120" Height="120" Background="{StaticResource PrismAccentBrush}" 
+                                CornerRadius="{StaticResource PrismCornerRadiusXL}" 
+                                HorizontalAlignment="Center" Margin="0,0,0,24">
+                            <FontIcon Glyph="&#xE7FC;" FontSize="64" Foreground="White" 
+                                      HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <TextBlock Text="欢迎使用 Prism Launcher" Style="{StaticResource PrismTitleTextStyle}" 
+                                   HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                        <TextBlock Text="选择一个实例开始游戏，或创建新实例" Style="{StaticResource PrismBodyTextStyle}" 
+                                   HorizontalAlignment="Center" Margin="0,0,0,32"/>
                         <Button x:Name="CreateInstanceButton" Content="创建新实例" 
-                                Style="{StaticResource AccentButtonStyle}" Click="CreateInstance_Click"/>
+                                Style="{StaticResource PrismPrimaryButtonStyle}" 
+                                Click="CreateInstance_Click">
+                            <Button.Content>
+                                <StackPanel Orientation="Horizontal">
+                                    <FontIcon Glyph="&#xE710;" FontSize="16" Margin="0,0,8,0"/>
+                                    <TextBlock Text="创建新实例"/>
+                                </StackPanel>
+                            </Button.Content>
+                        </Button>
                     </StackPanel>
 
                     <!-- 实例详情页面 -->
                     <Grid x:Name="InstanceDetailsPanel" Visibility="Collapsed">
-                        <ScrollViewer>
-                            <StackPanel Margin="24">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel Margin="32">
                                 <!-- 实例信息卡片 -->
-                                <Border Background="{StaticResource PrismCardBrush}" CornerRadius="12" 
-                                        Padding="24" Margin="0,0,0,16">
+                                <Border Style="{StaticResource PrismCardStyle}" Margin="0,0,0,24">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto"/>
@@ -171,65 +297,104 @@
 
                                         <Border Grid.Column="0" Width="80" Height="80" 
                                                Background="{StaticResource PrismAccentBrush}" 
-                                               CornerRadius="12" Margin="0,0,16,0">
-                                            <FontIcon Glyph="&#xE7FC;" FontSize="40" Foreground="White"/>
+                                               CornerRadius="{StaticResource PrismCornerRadiusL}" 
+                                               Margin="0,0,24,0">
+                                            <FontIcon Glyph="&#xE7FC;" FontSize="40" Foreground="White" 
+                                                      HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                         </Border>
 
                                         <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                             <TextBlock x:Name="InstanceNameText" Text="实例名称" 
-                                                       FontSize="24" FontWeight="SemiBold" Foreground="White"/>
+                                                       Style="{StaticResource PrismTitleTextStyle}" 
+                                                       FontSize="28"/>
                                             <TextBlock x:Name="InstanceVersionText" Text="版本信息" 
-                                                       FontSize="14" Foreground="LightGray" Margin="0,4,0,0"/>
+                                                       Style="{StaticResource PrismBodyTextStyle}" 
+                                                       Margin="0,4,0,0"/>
                                             <TextBlock x:Name="InstanceLastPlayedText" Text="最后游玩" 
-                                                       FontSize="12" Foreground="Gray" Margin="0,2,0,0"/>
+                                                       Style="{StaticResource PrismCaptionTextStyle}" 
+                                                       Margin="0,2,0,0"/>
                                         </StackPanel>
                                     </Grid>
                                 </Border>
 
                                 <!-- 快速操作 -->
-                                <TextBlock Text="快速操作" FontSize="18" FontWeight="SemiBold" 
-                                           Foreground="White" Margin="0,0,0,12"/>
-                                <Grid>
+                                <TextBlock Text="快速操作" Style="{StaticResource PrismSubtitleTextStyle}" 
+                                           Margin="0,0,0,16"/>
+                                <Grid Margin="0,0,0,32">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
 
-                                    <Button Grid.Column="0" Content="启动游戏" Style="{StaticResource AccentButtonStyle}" 
-                                            Margin="0,0,8,0" Click="Launch_Click"/>
-                                    <Button Grid.Column="1" Content="编辑实例" Margin="4,0" Click="Edit_Click"/>
-                                    <Button Grid.Column="2" Content="查看日志" Margin="8,0,0,0" Click="ViewLogs_Click"/>
+                                    <Button Grid.Column="0" Content="启动游戏" 
+                                            Style="{StaticResource PrismPrimaryButtonStyle}" 
+                                            Margin="0,0,8,0" Click="Launch_Click">
+                                        <Button.Content>
+                                            <StackPanel Orientation="Horizontal">
+                                                <FontIcon Glyph="&#xE768;" FontSize="16" Margin="0,0,8,0"/>
+                                                <TextBlock Text="启动游戏"/>
+                                            </StackPanel>
+                                        </Button.Content>
+                                    </Button>
+                                    <Button Grid.Column="1" Content="编辑实例" 
+                                            Style="{StaticResource PrismSecondaryButtonStyle}" 
+                                            Margin="4,0" Click="Edit_Click">
+                                        <Button.Content>
+                                            <StackPanel Orientation="Horizontal">
+                                                <FontIcon Glyph="&#xE70F;" FontSize="16" Margin="0,0,8,0"/>
+                                                <TextBlock Text="编辑实例"/>
+                                            </StackPanel>
+                                        </Button.Content>
+                                    </Button>
+                                    <Button Grid.Column="2" Content="查看日志" 
+                                            Style="{StaticResource PrismSecondaryButtonStyle}" 
+                                            Margin="8,0,0,0" Click="ViewLogs_Click">
+                                        <Button.Content>
+                                            <StackPanel Orientation="Horizontal">
+                                                <FontIcon Glyph="&#xE7C3;" FontSize="16" Margin="0,0,8,0"/>
+                                                <TextBlock Text="查看日志"/>
+                                            </StackPanel>
+                                        </Button.Content>
+                                    </Button>
                                 </Grid>
 
                                 <!-- 实例统计 -->
-                                <TextBlock Text="统计信息" FontSize="18" FontWeight="SemiBold" 
-                                           Foreground="White" Margin="0,24,0,12"/>
-                                <Grid Background="{StaticResource PrismCardBrush}" CornerRadius="8" Padding="16">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
+                                <TextBlock Text="统计信息" Style="{StaticResource PrismSubtitleTextStyle}" 
+                                           Margin="0,0,0,16"/>
+                                <Border Style="{StaticResource PrismCardStyle}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
 
-                                    <StackPanel Grid.Column="0" HorizontalAlignment="Center">
-                                        <TextBlock Text="总游戏时间" FontSize="12" Foreground="Gray" HorizontalAlignment="Center"/>
-                                        <TextBlock x:Name="TotalPlayTimeText" Text="0 小时" FontSize="16" 
-                                                   FontWeight="SemiBold" Foreground="White" HorizontalAlignment="Center"/>
-                                    </StackPanel>
+                                        <StackPanel Grid.Column="0" HorizontalAlignment="Center">
+                                            <TextBlock Text="总游戏时间" Style="{StaticResource PrismCaptionTextStyle}" 
+                                                       HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                                            <TextBlock x:Name="TotalPlayTimeText" Text="0 小时" 
+                                                       Style="{StaticResource PrismSubtitleTextStyle}" 
+                                                       HorizontalAlignment="Center"/>
+                                        </StackPanel>
 
-                                    <StackPanel Grid.Column="1" HorizontalAlignment="Center">
-                                        <TextBlock Text="启动次数" FontSize="12" Foreground="Gray" HorizontalAlignment="Center"/>
-                                        <TextBlock x:Name="LaunchCountText" Text="0" FontSize="16" 
-                                                   FontWeight="SemiBold" Foreground="White" HorizontalAlignment="Center"/>
-                                    </StackPanel>
+                                        <StackPanel Grid.Column="1" HorizontalAlignment="Center">
+                                            <TextBlock Text="启动次数" Style="{StaticResource PrismCaptionTextStyle}" 
+                                                       HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                                            <TextBlock x:Name="LaunchCountText" Text="0" 
+                                                       Style="{StaticResource PrismSubtitleTextStyle}" 
+                                                       HorizontalAlignment="Center"/>
+                                        </StackPanel>
 
-                                    <StackPanel Grid.Column="2" HorizontalAlignment="Center">
-                                        <TextBlock Text="最后启动" FontSize="12" Foreground="Gray" HorizontalAlignment="Center"/>
-                                        <TextBlock x:Name="LastLaunchText" Text="从未" FontSize="16" 
-                                                   FontWeight="SemiBold" Foreground="White" HorizontalAlignment="Center"/>
-                                    </StackPanel>
-                                </Grid>
+                                        <StackPanel Grid.Column="2" HorizontalAlignment="Center">
+                                            <TextBlock Text="最后启动" Style="{StaticResource PrismCaptionTextStyle}" 
+                                                       HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                                            <TextBlock x:Name="LastLaunchText" Text="从未" 
+                                                       Style="{StaticResource PrismSubtitleTextStyle}" 
+                                                       HorizontalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
                             </StackPanel>
                         </ScrollViewer>
                     </Grid>
@@ -237,21 +402,26 @@
             </Grid>
         </Grid>
 
-        <!-- 状态栏 -->
-        <Border Grid.Row="2" Height="32" Background="{StaticResource PrismSurfaceBrush}" 
-                BorderBrush="{StaticResource PrismAccentBrush}" BorderThickness="0,1,0,0">
+        <!-- 现代化状态栏 -->
+        <Border Grid.Row="2" Height="40" Background="{StaticResource PrismSurfaceBrush}" 
+                BorderBrush="{StaticResource PrismDividerBrush}" BorderThickness="0,1,0,0">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <TextBlock x:Name="StatusText" Text="就绪" Foreground="White" 
-                           VerticalAlignment="Center" Margin="16,0,0,0"/>
+                <TextBlock x:Name="StatusText" Text="就绪" 
+                           Style="{StaticResource PrismCaptionTextStyle}" 
+                           VerticalAlignment="Center" Margin="24,0,0,0"/>
                 
-                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,16,0">
-                    <TextBlock x:Name="InstanceCountText" Text="0 个实例" Foreground="LightGray" Margin="0,0,16,0"/>
-                    <TextBlock x:Name="RunningCountText" Text="0 个运行中" Foreground="Green"/>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" 
+                            Margin="0,0,24,0" Spacing="16">
+                    <TextBlock x:Name="InstanceCountText" Text="0 个实例" 
+                               Style="{StaticResource PrismCaptionTextStyle}"/>
+                    <TextBlock x:Name="RunningCountText" Text="0 个运行中" 
+                               Style="{StaticResource PrismCaptionTextStyle}" 
+                               Foreground="{StaticResource PrismSuccessBrush}"/>
                 </StackPanel>
             </Grid>
         </Border>

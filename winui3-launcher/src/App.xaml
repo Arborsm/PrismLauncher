@@ -1,21 +1,214 @@
 <Application
     x:Class="PrismLauncherWinUI3.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="using:PrismLauncherWinUI3.Converters">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
+                <ResourceDictionary Source="ms-appx:///Styles/FluentStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             
-            <!-- 主题颜色 -->
+            <!-- 转换器 -->
+            <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+            <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
+            
+            <!-- Fluent UI 颜色系统 -->
             <SolidColorBrush x:Key="PrismAccentBrush" Color="#7C3AED"/>
-            <SolidColorBrush x:Key="PrismBackgroundBrush" Color="#1E1E1E"/>
-            <SolidColorBrush x:Key="PrismSurfaceBrush" Color="#2D2D2D"/>
-            <SolidColorBrush x:Key="PrismCardBrush" Color="#3D3D3D"/>
+            <SolidColorBrush x:Key="PrismAccentLightBrush" Color="#A855F7"/>
+            <SolidColorBrush x:Key="PrismAccentDarkBrush" Color="#6D28D9"/>
+            
+            <SolidColorBrush x:Key="PrismBackgroundBrush" Color="#0F0F0F"/>
+            <SolidColorBrush x:Key="PrismSurfaceBrush" Color="#1C1C1C"/>
+            <SolidColorBrush x:Key="PrismCardBrush" Color="#2D2D2D"/>
+            <SolidColorBrush x:Key="PrismElevatedBrush" Color="#3D3D3D"/>
+            
+            <SolidColorBrush x:Key="PrismTextPrimaryBrush" Color="#FFFFFF"/>
+            <SolidColorBrush x:Key="PrismTextSecondaryBrush" Color="#CCCCCC"/>
+            <SolidColorBrush x:Key="PrismTextTertiaryBrush" Color="#999999"/>
+            
+            <SolidColorBrush x:Key="PrismBorderBrush" Color="#404040"/>
+            <SolidColorBrush x:Key="PrismDividerBrush" Color="#2D2D2D"/>
+            
+            <!-- 状态颜色 -->
+            <SolidColorBrush x:Key="PrismSuccessBrush" Color="#10B981"/>
+            <SolidColorBrush x:Key="PrismWarningBrush" Color="#F59E0B"/>
+            <SolidColorBrush x:Key="PrismErrorBrush" Color="#EF4444"/>
+            <SolidColorBrush x:Key="PrismInfoBrush" Color="#3B82F6"/>
             
             <!-- 字体 -->
             <FontFamily x:Key="PrismFontFamily">Segoe UI Variable</FontFamily>
+            <FontFamily x:Key="PrismMonoFontFamily">Cascadia Code</FontFamily>
+            
+            <!-- 字体大小 -->
+            <x:Double x:Key="PrismFontSizeSmall">12</x:Double>
+            <x:Double x:Key="PrismFontSizeMedium">14</x:Double>
+            <x:Double x:Key="PrismFontSizeLarge">16</x:Double>
+            <x:Double x:Key="PrismFontSizeXLarge">18</x:Double>
+            <x:Double x:Key="PrismFontSizeXXLarge">24</x:Double>
+            
+            <!-- 间距 -->
+            <x:Double x:Key="PrismSpacingXS">4</x:Double>
+            <x:Double x:Key="PrismSpacingS">8</x:Double>
+            <x:Double x:Key="PrismSpacingM">16</x:Double>
+            <x:Double x:Key="PrismSpacingL">24</x:Double>
+            <x:Double x:Key="PrismSpacingXL">32</x:Double>
+            
+            <!-- 圆角 -->
+            <CornerRadius x:Key="PrismCornerRadiusS">4</CornerRadius>
+            <CornerRadius x:Key="PrismCornerRadiusM">8</CornerRadius>
+            <CornerRadius x:Key="PrismCornerRadiusL">12</CornerRadius>
+            <CornerRadius x:Key="PrismCornerRadiusXL">16</CornerRadius>
+            
+            <!-- 阴影 -->
+            <DropShadow x:Key="PrismShadowS" Color="#000000" BlurRadius="4" Offset="0,2" Opacity="0.1"/>
+            <DropShadow x:Key="PrismShadowM" Color="#000000" BlurRadius="8" Offset="0,4" Opacity="0.15"/>
+            <DropShadow x:Key="PrismShadowL" Color="#000000" BlurRadius="16" Offset="0,8" Opacity="0.2"/>
+            
+            <!-- 按钮样式 -->
+            <Style x:Key="PrismPrimaryButtonStyle" TargetType="Button">
+                <Setter Property="Background" Value="{StaticResource PrismAccentBrush}"/>
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="BorderBrush" Value="{StaticResource PrismAccentBrush}"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="CornerRadius" Value="{StaticResource PrismCornerRadiusM}"/>
+                <Setter Property="Padding" Value="16,8"/>
+                <Setter Property="FontFamily" Value="{StaticResource PrismFontFamily}"/>
+                <Setter Property="FontSize" Value="{StaticResource PrismFontSizeMedium}"/>
+                <Setter Property="FontWeight" Value="SemiBold"/>
+                <Setter Property="MinHeight" Value="32"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="RootBorder" 
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="{TemplateBinding CornerRadius}">
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroup x:Name="CommonStates">
+                                        <VisualState x:Name="Normal"/>
+                                        <VisualState x:Name="PointerOver">
+                                            <Storyboard>
+                                                <ColorAnimation Storyboard.TargetName="RootBorder" 
+                                                              Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                              To="#8B5CF6" Duration="0:0:0.2"/>
+                                            </Storyboard>
+                                        </VisualState>
+                                        <VisualState x:Name="Pressed">
+                                            <Storyboard>
+                                                <ColorAnimation Storyboard.TargetName="RootBorder" 
+                                                              Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                              To="#6D28D9" Duration="0:0:0.1"/>
+                                            </Storyboard>
+                                        </VisualState>
+                                        <VisualState x:Name="Disabled">
+                                            <Storyboard>
+                                                <ColorAnimation Storyboard.TargetName="RootBorder" 
+                                                              Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                              To="#404040" Duration="0:0:0.2"/>
+                                            </Storyboard>
+                                        </VisualState>
+                                    </VisualStateGroup>
+                                </VisualStateManager.VisualStateGroups>
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            
+            <Style x:Key="PrismSecondaryButtonStyle" TargetType="Button" BasedOn="{StaticResource PrismPrimaryButtonStyle}">
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="Foreground" Value="{StaticResource PrismTextPrimaryBrush}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource PrismBorderBrush}"/>
+            </Style>
+            
+            <!-- 卡片样式 -->
+            <Style x:Key="PrismCardStyle" TargetType="Border">
+                <Setter Property="Background" Value="{StaticResource PrismCardBrush}"/>
+                <Setter Property="CornerRadius" Value="{StaticResource PrismCornerRadiusL}"/>
+                <Setter Property="Padding" Value="{StaticResource PrismSpacingL}"/>
+                <Setter Property="Effect" Value="{StaticResource PrismShadowM}"/>
+            </Style>
+            
+            <!-- 实例卡片样式 -->
+            <Style x:Key="PrismInstanceCardStyle" TargetType="Border">
+                <Setter Property="Background" Value="{StaticResource PrismCardBrush}"/>
+                <Setter Property="CornerRadius" Value="{StaticResource PrismCornerRadiusM}"/>
+                <Setter Property="Padding" Value="{StaticResource PrismSpacingM}"/>
+                <Setter Property="Margin" Value="0,0,0,{StaticResource PrismSpacingS}"/>
+                <Setter Property="Effect" Value="{StaticResource PrismShadowS}"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Border">
+                            <Border x:Name="RootBorder" 
+                                    Background="{TemplateBinding Background}"
+                                    CornerRadius="{TemplateBinding CornerRadius}"
+                                    Padding="{TemplateBinding Padding}"
+                                    Margin="{TemplateBinding Margin}">
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroup x:Name="CommonStates">
+                                        <VisualState x:Name="Normal"/>
+                                        <VisualState x:Name="PointerOver">
+                                            <Storyboard>
+                                                <ColorAnimation Storyboard.TargetName="RootBorder" 
+                                                              Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                              To="#3D3D3D" Duration="0:0:0.2"/>
+                                                <DoubleAnimation Storyboard.TargetName="RootBorder" 
+                                                               Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.ScaleX)"
+                                                               To="1.02" Duration="0:0:0.2"/>
+                                                <DoubleAnimation Storyboard.TargetName="RootBorder" 
+                                                               Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.ScaleY)"
+                                                               To="1.02" Duration="0:0:0.2"/>
+                                            </Storyboard>
+                                        </VisualState>
+                                        <VisualState x:Name="Pressed">
+                                            <Storyboard>
+                                                <ColorAnimation Storyboard.TargetName="RootBorder" 
+                                                              Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                              To="#404040" Duration="0:0:0.1"/>
+                                            </Storyboard>
+                                        </VisualState>
+                                    </VisualStateGroup>
+                                </VisualStateManager.VisualStateGroups>
+                                <Border.RenderTransform>
+                                    <CompositeTransform/>
+                                </Border.RenderTransform>
+                                <ContentPresenter/>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            
+            <!-- 文本样式 -->
+            <Style x:Key="PrismTitleTextStyle" TargetType="TextBlock">
+                <Setter Property="FontFamily" Value="{StaticResource PrismFontFamily}"/>
+                <Setter Property="FontSize" Value="{StaticResource PrismFontSizeXXLarge}"/>
+                <Setter Property="FontWeight" Value="SemiBold"/>
+                <Setter Property="Foreground" Value="{StaticResource PrismTextPrimaryBrush}"/>
+            </Style>
+            
+            <Style x:Key="PrismSubtitleTextStyle" TargetType="TextBlock">
+                <Setter Property="FontFamily" Value="{StaticResource PrismFontFamily}"/>
+                <Setter Property="FontSize" Value="{StaticResource PrismFontSizeLarge}"/>
+                <Setter Property="FontWeight" Value="Medium"/>
+                <Setter Property="Foreground" Value="{StaticResource PrismTextSecondaryBrush}"/>
+            </Style>
+            
+            <Style x:Key="PrismBodyTextStyle" TargetType="TextBlock">
+                <Setter Property="FontFamily" Value="{StaticResource PrismFontFamily}"/>
+                <Setter Property="FontSize" Value="{StaticResource PrismFontSizeMedium}"/>
+                <Setter Property="Foreground" Value="{StaticResource PrismTextSecondaryBrush}"/>
+            </Style>
+            
+            <Style x:Key="PrismCaptionTextStyle" TargetType="TextBlock">
+                <Setter Property="FontFamily" Value="{StaticResource PrismFontFamily}"/>
+                <Setter Property="FontSize" Value="{StaticResource PrismFontSizeSmall}"/>
+                <Setter Property="Foreground" Value="{StaticResource PrismTextTertiaryBrush}"/>
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

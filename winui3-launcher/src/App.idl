@@ -4,5 +4,6 @@ namespace PrismLauncherWinUI3
     runtimeclass App : Microsoft.UI.Xaml.Application
     {
         App();
+        void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args);
     }
 }

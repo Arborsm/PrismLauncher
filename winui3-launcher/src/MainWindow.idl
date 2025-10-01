@@ -4,5 +4,9 @@ namespace PrismLauncherWinUI3
     runtimeclass MainWindow : Microsoft.UI.Xaml.Window
     {
         MainWindow();
+        void LoadInstances();
+        void RefreshInstanceList();
+        void ShowInstanceDetails(String instanceId);
+        void HideInstanceDetails();
     }
 }
