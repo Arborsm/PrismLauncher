@@ -1,123 +1,209 @@
-<p align="center">
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="/program_info/org.prismlauncher.PrismLauncher.logo-darkmode.svg">
-  <source media="(prefers-color-scheme: light)" srcset="/program_info/org.prismlauncher.PrismLauncher.logo.svg">
-  <img alt="Prism Launcher" src="/program_info/org.prismlauncher.PrismLauncher.logo.svg" width="40%">
-</picture>
-</p>
+# Prism Launcher - Modern Architecture
 
-<p align="center">
-  Prism Launcher is a custom launcher for Minecraft that allows you to easily manage multiple installations of Minecraft at once.<br />
-  <br />This is a <b>fork</b> of the MultiMC Launcher and is <b>not</b> endorsed by it.
-</p>
+这是一个基于PrismLauncher项目的现代化架构重构，包含IPC通信兼容层、无Qt依赖的Core构建，以及使用FluentUI的现代桌面前端。
 
-## Installation
+## 项目结构
 
-<a href="https://repology.org/project/prismlauncher/versions">
-    <img src="https://repology.org/badge/vertical-allrepos/prismlauncher.svg" alt="Packaging status" align="right">
-</a>
+```
+├── core/                    # 核心后端（无Qt依赖）
+│   ├── CMakeLists.txt      # Core构建配置
+│   ├── BaseInstance.h/cpp  # 实例管理
+│   └── ipc/                # IPC通信层
+│       ├── IPCInterface.h   # IPC接口定义
+│       ├── IPCManager.h/cpp # IPC管理器
+│       ├── IPCService.h/cpp # IPC服务实现
+│       └── IPCClient.h/cpp  # IPC客户端
+├── frontend/               # FluentUI前端
+│   ├── src/
+│   │   ├── components/     # React组件
+│   │   ├── pages/          # 页面组件
+│   │   ├── stores/         # Zustand状态管理
+│   │   ├── services/       # IPC服务
+│   │   └── types/          # TypeScript类型
+│   ├── electron/           # Electron主进程
+│   └── package.json        # 前端依赖
+└── launcher/               # 原始PrismLauncher代码
+```
 
-- All downloads and instructions for Prism Launcher can be found on our [Website](https://prismlauncher.org/download).
-- Last build status can be found in the [GitHub Actions](https://github.com/PrismLauncher/PrismLauncher/actions) tab (this also includes the pull requests status).
+## 核心功能
 
-### Development Builds
+### IPC通信兼容层
 
-Please understand that these builds are not intended for most users. There may be bugs, and other instabilities. You have been warned.
+- **统一接口**: 提供统一的IPC通信接口，支持同步和异步调用
+- **服务方法**: 涵盖实例管理、账户管理、Java管理、启动控制、设置管理、模组平台等
+- **事件系统**: 支持实时事件通知和状态更新
+- **错误处理**: 完善的错误处理和状态管理
 
-There are development builds available through:
+### Core构建（无Qt依赖）
 
-- [GitHub Actions](https://github.com/PrismLauncher/PrismLauncher/actions) (includes builds from pull requests opened by contribuitors)
-- [nightly.link](https://nightly.link/PrismLauncher/PrismLauncher/workflows/build/develop) (this will always point only to the latest version of develop)
+- **轻量级**: 移除Qt依赖，减少二进制大小
+- **跨平台**: 支持Windows、macOS、Linux
+- **模块化**: 清晰的模块分离和接口定义
+- **高性能**: 优化的数据结构和算法
 
-These have debug information in the binaries, so their file sizes are relatively larger.
+### FluentUI前端
 
-Prebuilt Development builds are provided for **Linux**, **Windows** and **macOS**.
+- **现代UI**: 使用Microsoft FluentUI设计系统
+- **响应式**: 支持不同屏幕尺寸和分辨率
+- **主题支持**: 支持明暗主题切换
+- **实时更新**: 基于IPC的实时状态同步
 
-For **Arch**, **Debian**, **Fedora**, **OpenSUSE (Tumbleweed)** and **Gentoo**, respectively, you can use these packages for the latest development versions:
+## 主要特性
 
-[![prismlauncher-git](https://img.shields.io/badge/aur-prismlauncher--git-1793D1?label=AUR&logo=archlinux&logoColor=white)](https://aur.archlinux.org/packages/prismlauncher-git) [![prismlauncher-git](https://img.shields.io/badge/aur-prismlauncher--qt5--git-1793D1?label=AUR&logo=archlinux&logoColor=white)](https://aur.archlinux.org/packages/prismlauncher-qt5-git) [![prismlauncher-git](https://img.shields.io/badge/mpr-prismlauncher--git-A80030?label=MPR&logo=debian&logoColor=white)](https://mpr.makedeb.org/packages/prismlauncher-git)<br />[![prismlauncher-nightly](https://img.shields.io/badge/copr-prismlauncher--nightly-51A2DA?label=COPR&logo=fedora&logoColor=white)](https://copr.fedorainfracloud.org/coprs/g3tchoo/prismlauncher/) [![prismlauncher-nightly](https://img.shields.io/badge/OBS-prismlauncher--nightly-3AB6A9?logo=opensuse&logoColor=white)](https://build.opensuse.org/project/show/home:getchoo) [![prismlauncher-9999](https://img.shields.io/badge/gentoo-prismlauncher--9999-4D4270?label=Gentoo&logo=gentoo&logoColor=white)](https://packages.gentoo.org/packages/games-action/prismlauncher)
+### 实例管理
+- 创建、删除、复制Minecraft实例
+- 版本管理和更新
+- 启动状态监控
+- 实例配置管理
 
-These packages are also available to all the distributions based on the ones mentioned above.
+### 账户管理
+- Microsoft账户认证
+- 离线账户支持
+- 账户状态管理
+- 自动登录
 
-## Community & Support
+### Java管理
+- 自动检测Java安装
+- 版本兼容性检查
+- 自动下载和安装
+- 路径管理
 
-Feel free to create a GitHub issue if you find a bug or want to suggest a new feature. We have multiple community spaces where other community members can help you:
+### 模组平台集成
+- CurseForge支持
+- Modrinth支持
+- 本地模组管理
+- 依赖解析
 
-- **Our Discord server:**
+### 启动控制
+- 游戏启动和停止
+- 日志实时显示
+- 进程监控
+- 错误处理
 
-[![Prism Launcher Discord server](https://discordapp.com/api/guilds/1031648380885147709/widget.png?style=banner3)](https://prismlauncher.org/discord)
+## 技术栈
 
-- **Our Matrix space:**
+### 后端
+- **C++20**: 现代C++特性
+- **CMake**: 构建系统
+- **标准库**: 无外部依赖的核心功能
+- **IPC**: 进程间通信
 
-[![Prism Launcher Space](https://img.shields.io/matrix/prismlauncher:matrix.org?style=for-the-badge&label=Matrix%20Space&logo=matrix&color=purple)](https://prismlauncher.org/matrix)
+### 前端
+- **React 18**: 用户界面框架
+- **TypeScript**: 类型安全
+- **FluentUI**: Microsoft设计系统
+- **Electron**: 桌面应用框架
+- **Zustand**: 状态管理
+- **Vite**: 构建工具
 
-- **Our Subreddit:**
+## 构建说明
 
-[![r/PrismLauncher](https://img.shields.io/reddit/subreddit-subscribers/prismlauncher?style=for-the-badge&logo=reddit)](https://prismlauncher.org/reddit)
+### 后端构建
 
-## Translations
+```bash
+# 创建构建目录
+mkdir build && cd build
 
-The translation effort for Prism Launcher is hosted on [Weblate](https://hosted.weblate.org/projects/prismlauncher/launcher/) and information about translating Prism Launcher is available at <https://github.com/PrismLauncher/Translations>.
+# 配置CMake
+cmake .. -DCMAKE_BUILD_TYPE=Release
 
-## Building
+# 编译
+make -j$(nproc)
+```
 
-If you want to build Prism Launcher yourself, check the build instructions:
+### 前端构建
 
-- [Windows](https://prismlauncher.org/wiki/development/build-instructions/windows/)
-- [Linux](https://prismlauncher.org/wiki/development/build-instructions/linux/)
-- [MacOS](https://prismlauncher.org/wiki/development/build-instructions/macos/)
-- [OpenBSD](https://prismlauncher.org/wiki/development/build-instructions/openbsd/)
+```bash
+# 安装依赖
+npm install
 
-## Sponsors & Partners
+# 开发模式
+npm run dev
 
-We thank all the wonderful backers over at Open Collective! Support Prism Launcher by [becoming a backer](https://opencollective.com/prismlauncher).
+# 构建
+npm run build
 
-[![OpenCollective Backers](https://opencollective.com/prismlauncher/backers.svg?width=890&limit=1000)](https://opencollective.com/prismlauncher#backers)
+# Electron开发
+npm run electron-dev
 
-Thanks to JetBrains for providing us a few licenses for all their products, as part of their [Open Source program](https://www.jetbrains.com/opensource/).
+# Electron构建
+npm run electron-build
+```
 
-<a href="https://jb.gg/OpenSource">
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://www.jetbrains.com/company/brand/img/logo_jb_dos_4.svg">
-  <source media="(prefers-color-scheme: light)" srcset="https://resources.jetbrains.com/storage/products/company/brand/logos/jetbrains.svg">
-  <img alt="JetBrains logo" src="https://resources.jetbrains.com/storage/products/company/brand/logos/jetbrains.svg" width="40%">
-</picture>
-</a>
+## 架构设计
 
-Thanks to Weblate for hosting our translation efforts.
+### IPC通信流程
 
-<a href="https://hosted.weblate.org/engage/prismlauncher/">
-<img src="https://hosted.weblate.org/widgets/prismlauncher/-/open-graph.png" alt="Translation status" width="300" />
-</a>
+```
+Frontend (React/Electron)
+    ↓ IPC Request
+IPC Client
+    ↓ HTTP/WebSocket
+IPC Service
+    ↓ Core API
+Core Backend
+    ↓ Response
+IPC Service
+    ↓ HTTP/WebSocket
+IPC Client
+    ↓ IPC Response
+Frontend (React/Electron)
+```
 
-Thanks to Netlify for providing us their excellent web services, as part of their [Open Source program](https://www.netlify.com/open-source/).
+### 数据流
 
-<a href="https://www.netlify.com"> <img src="https://www.netlify.com/v3/img/components/netlify-color-accent.svg" alt="Deploys by Netlify" /> </a>
+1. **用户操作** → 前端组件
+2. **状态更新** → Zustand Store
+3. **IPC调用** → IPC Client
+4. **服务处理** → IPC Service
+5. **核心逻辑** → Core Backend
+6. **数据返回** → 前端更新
 
-Thanks to the awesome people over at [MacStadium](https://www.macstadium.com/), for providing M1-Macs for development purposes!
+## 开发指南
 
-<a href="https://www.macstadium.com"><img src="https://uploads-ssl.webflow.com/5ac3c046c82724970fc60918/5c019d917bba312af7553b49_MacStadium-developerlogo.png" alt="Powered by MacStadium" width="300"></a>
+### 添加新的IPC方法
 
-## Forking/Redistributing/Custom builds policy
+1. 在`IPCInterface.h`中定义新的`ServiceMethod`
+2. 在`IPCService.cpp`中实现处理方法
+3. 在`IPCClient.cpp`中添加客户端方法
+4. 在前端`IPCService.ts`中添加TypeScript接口
+5. 在相应的Store中添加状态管理
 
-You are free to fork, redistribute and provide custom builds as long as you follow the terms of the [license](LICENSE) (this is a legal responsibility), and if you made code changes rather than just packaging a custom build, please do the following as a basic courtesy:
+### 添加新的前端页面
 
-- Make it clear that your fork is not Prism Launcher and is not endorsed by or affiliated with the Prism Launcher project (<https://prismlauncher.org>).
-- Go through [CMakeLists.txt](CMakeLists.txt) and change Prism Launcher's API keys to your own or set them to empty strings (`""`) to disable them (this way the program will still compile but the functionality requiring those keys will be disabled).
+1. 在`src/pages/`中创建页面组件
+2. 在`src/components/`中创建相关组件
+3. 在`src/stores/`中添加状态管理
+4. 在`App.tsx`中添加路由
+5. 在`Sidebar.tsx`中添加导航项
 
-If you have any questions or want any clarification on the above conditions please make an issue and ask us.
+## 部署
 
-If you are just building Prism Launcher for your distribution, please make sure to set the `Launcher_BUILD_PLATFORM` to a slug representing your distribution. Examples are `archlinux`, `fedora` and `nixpkgs`.
+### 后端部署
+- 编译为静态库或动态库
+- 提供IPC服务接口
+- 支持多进程架构
 
-Note that if you build this software without removing the provided API keys in [CMakeLists.txt](CMakeLists.txt) you are accepting the following terms and conditions:
+### 前端部署
+- 打包为Electron应用
+- 支持自动更新
+- 跨平台分发
 
-- [Microsoft Identity Platform Terms of Use](https://docs.microsoft.com/en-us/legal/microsoft-identity-platform/terms-of-use)
-- [CurseForge 3rd Party API Terms and Conditions](https://support.curseforge.com/en/support/solutions/articles/9000207405-curse-forge-3rd-party-api-terms-and-conditions)
+## 贡献
 
-If you do not agree with these terms and conditions, then remove the associated API keys from the [CMakeLists.txt](CMakeLists.txt) file by setting them to an empty string (`""`).
+1. Fork项目
+2. 创建功能分支
+3. 提交更改
+4. 推送到分支
+5. 创建Pull Request
 
-## License [![https://github.com/PrismLauncher/PrismLauncher/blob/develop/LICENSE](https://img.shields.io/github/license/PrismLauncher/PrismLauncher?label=License&logo=gnu&color=C4282D)](LICENSE)
+## 许可证
 
-All launcher code is available under the GPL-3.0-only license.
+本项目基于GPL-3.0许可证开源。
 
-The logo and related assets are under the CC BY-SA 4.0 license.
+## 致谢
+
+- PrismLauncher项目团队
+- Microsoft FluentUI团队
+- Electron团队
+- React团队
