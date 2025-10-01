@@ -45,11 +45,12 @@ if errorlevel 1 (
     echo [WARNING] Git安装失败，请手动安装
 )
 
-REM 安装CMake
-echo [INFO] 安装CMake...
-choco install cmake -y
+REM 安装Rust
+echo [INFO] 安装Rust...
+choco install rust -y
 if errorlevel 1 (
-    echo [WARNING] CMake安装失败，请手动安装
+    echo [WARNING] Rust安装失败，请手动安装
+    echo [INFO] 访问 https://rustup.rs/ 安装Rust
 )
 
 REM 安装Node.js
@@ -59,18 +60,11 @@ if errorlevel 1 (
     echo [WARNING] Node.js安装失败，请手动安装
 )
 
-REM 安装Visual Studio Build Tools
+REM 安装Visual Studio Build Tools（Rust需要）
 echo [INFO] 安装Visual Studio Build Tools...
 choco install visualstudio2022buildtools -y
 if errorlevel 1 (
     echo [WARNING] Visual Studio Build Tools安装失败，请手动安装
-)
-
-REM 安装Python（用于某些构建工具）
-echo [INFO] 安装Python...
-choco install python -y
-if errorlevel 1 (
-    echo [WARNING] Python安装失败，请手动安装
 )
 
 REM 3. 刷新环境变量
@@ -88,12 +82,20 @@ if errorlevel 1 (
     echo [SUCCESS] Git安装成功
 )
 
-echo [INFO] 检查CMake...
-cmake --version
+echo [INFO] 检查Rust...
+rustc --version
 if errorlevel 1 (
-    echo [ERROR] CMake未正确安装
+    echo [ERROR] Rust未正确安装
 ) else (
-    echo [SUCCESS] CMake安装成功
+    echo [SUCCESS] Rust安装成功
+)
+
+echo [INFO] 检查Cargo...
+cargo --version
+if errorlevel 1 (
+    echo [ERROR] Cargo未正确安装
+) else (
+    echo [SUCCESS] Cargo安装成功
 )
 
 echo [INFO] 检查Node.js...
@@ -130,7 +132,7 @@ echo 环境设置完成！
 echo ========================================
 echo.
 echo 下一步：
-echo 1. 打开 "Developer Command Prompt for VS 2022"
+echo 1. 打开命令提示符或PowerShell
 echo 2. 导航到项目目录
 echo 3. 运行: build.bat all
 echo.
@@ -138,6 +140,10 @@ echo 或者使用PowerShell：
 echo 1. 打开PowerShell
 echo 2. 导航到项目目录
 echo 3. 运行: .\build.ps1 all
+echo.
+echo 开发模式：
+echo 1. 运行: run-dev.bat
+echo 2. 在浏览器中访问 http://localhost:1420
 echo.
 
 pause

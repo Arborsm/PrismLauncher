@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { InstanceInfo, AccountInfo, JavaInfo, SystemInfo, ModInfo, LaunchStatus, AppSettings } from '@/types';
+import { tauriService } from './TauriService';
 
 // IPC Service interface
 export interface IPCService {
@@ -48,14 +49,12 @@ export interface IPCService {
   offEvent(callback: (event: any) => void): void;
 }
 
-// Mock IPC Service implementation
-class MockIPCService implements IPCService {
-  private connected = false;
+// Tauri IPC Service implementation
+class TauriIPCService implements IPCService {
+  private connected = true; // Tauri is always connected
   private eventCallbacks: ((event: any) => void)[] = [];
 
   async connect(): Promise<boolean> {
-    // Simulate connection delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
     this.connected = true;
     return true;
   }
@@ -69,29 +68,10 @@ class MockIPCService implements IPCService {
   }
 
   async getInstances(): Promise<InstanceInfo[]> {
-    await this.simulateDelay();
-    return [
-      {
-        id: 'instance1',
-        name: 'Test Instance 1',
-        version: '1.20.1',
-        iconPath: '',
-        instancePath: './instances/test1',
-        isRunning: false,
-      },
-      {
-        id: 'instance2',
-        name: 'Test Instance 2',
-        version: '1.19.4',
-        iconPath: '',
-        instancePath: './instances/test2',
-        isRunning: true,
-      },
-    ];
+    return await tauriService.getInstances();
   }
 
   async getInstance(id: string): Promise<InstanceInfo> {
-    await this.simulateDelay();
     const instances = await this.getInstances();
     const instance = instances.find(i => i.id === id);
     if (!instance) {
@@ -101,8 +81,7 @@ class MockIPCService implements IPCService {
   }
 
   async createInstance(name: string, version = 'latest'): Promise<string> {
-    await this.simulateDelay();
-    const id = `instance_${Date.now()}`;
+    const id = await tauriService.createInstance(name, version);
     
     // Emit event
     this.emitEvent({
@@ -115,71 +94,67 @@ class MockIPCService implements IPCService {
   }
 
   async deleteInstance(id: string): Promise<boolean> {
-    await this.simulateDelay();
+    const result = await tauriService.deleteInstance(id);
     
-    // Emit event
-    this.emitEvent({
-      type: 'instance.deleted',
-      data: { instanceId: id },
-      timestamp: new Date(),
-    });
+    if (result) {
+      // Emit event
+      this.emitEvent({
+        type: 'instance.deleted',
+        data: { instanceId: id },
+        timestamp: new Date(),
+      });
+    }
 
-    return true;
+    return result;
   }
 
   async launchInstance(id: string): Promise<boolean> {
-    await this.simulateDelay();
+    const result = await tauriService.launchInstance(id);
     
-    // Emit event
-    this.emitEvent({
-      type: 'instance.launched',
-      data: { instanceId: id },
-      timestamp: new Date(),
-    });
+    if (result) {
+      // Emit event
+      this.emitEvent({
+        type: 'instance.launched',
+        data: { instanceId: id },
+        timestamp: new Date(),
+      });
+    }
 
-    return true;
+    return result;
   }
 
   async stopInstance(id: string): Promise<boolean> {
-    await this.simulateDelay();
+    const result = await tauriService.stopInstance(id);
     
-    // Emit event
-    this.emitEvent({
-      type: 'instance.stopped',
-      data: { instanceId: id },
-      timestamp: new Date(),
-    });
+    if (result) {
+      // Emit event
+      this.emitEvent({
+        type: 'instance.stopped',
+        data: { instanceId: id },
+        timestamp: new Date(),
+      });
+    }
 
-    return true;
+    return result;
   }
 
   async getLaunchStatus(id: string): Promise<LaunchStatus> {
-    await this.simulateDelay();
+    // Tauri implementation would get real launch status
     return {
       instanceId: id,
-      isRunning: Math.random() > 0.5,
-      processId: Math.floor(Math.random() * 10000) + 1000,
-      status: 'running',
+      isRunning: false,
+      processId: 0,
+      status: 'stopped',
       errorMessage: '',
     };
   }
 
   async getAccounts(): Promise<AccountInfo[]> {
-    await this.simulateDelay();
-    return [
-      {
-        id: 'account1',
-        username: 'TestUser',
-        uuid: '12345678-1234-1234-1234-123456789012',
-        type: 'offline',
-        isValid: true,
-      },
-    ];
+    return await tauriService.getAccounts();
   }
 
   async addAccount(username: string, type: 'microsoft' | 'offline'): Promise<string> {
-    await this.simulateDelay();
-    const id = `account_${Date.now()}`;
+    const id = await tauriService.addAccount(username, type);
     
     // Emit event
     this.emitEvent({
@@ -192,59 +167,45 @@ class MockIPCService implements IPCService {
   }
 
   async removeAccount(id: string): Promise<boolean> {
-    await this.simulateDelay();
+    const result = await tauriService.removeAccount(id);
     
-    // Emit event
-    this.emitEvent({
-      type: 'account.removed',
-      data: { accountId: id },
-      timestamp: new Date(),
-    });
+    if (result) {
+      // Emit event
+      this.emitEvent({
+        type: 'account.removed',
+        data: { accountId: id },
+        timestamp: new Date(),
+      });
+    }
 
-    return true;
+    return result;
   }
 
   async loginAccount(id: string): Promise<boolean> {
-    await this.simulateDelay();
-    
-    // Emit event
+    // Tauri implementation would handle login
     this.emitEvent({
       type: 'account.logged_in',
       data: { accountId: id },
       timestamp: new Date(),
     });
-
     return true;
   }
 
   async logoutAccount(id: string): Promise<boolean> {
-    await this.simulateDelay();
-    
-    // Emit event
+    // Tauri implementation would handle logout
     this.emitEvent({
       type: 'account.logged_out',
       data: { accountId: id },
       timestamp: new Date(),
     });
-
     return true;
   }
 
   async getJavaInstalls(): Promise<JavaInfo[]> {
-    await this.simulateDelay();
-    return [
-      {
-        id: 'java1',
-        version: '17.0.2',
-        path: '/usr/lib/jvm/java-17-openjdk',
-        architecture: 'x86_64',
-        isValid: true,
-      },
-    ];
+    return await tauriService.getJavaInstalls();
   }
 
   async getJavaInfo(id: string): Promise<JavaInfo> {
-    await this.simulateDelay();
     const javaInstalls = await this.getJavaInstalls();
     const java = javaInstalls.find(j => j.id === id);
     if (!java) {
@@ -254,36 +215,26 @@ class MockIPCService implements IPCService {
   }
 
   async installJava(version: string): Promise<boolean> {
-    await this.simulateDelay();
-    return true;
+    return await tauriService.installJava(version);
   }
 
   async uninstallJava(id: string): Promise<boolean> {
-    await this.simulateDelay();
+    // Tauri implementation would handle uninstall
     return true;
   }
 
   async getSettings(): Promise<AppSettings> {
-    await this.simulateDelay();
-    return {
-      theme: 'dark',
-      language: 'en',
-      autoUpdate: true,
-      minimizeToTray: true,
-      startMinimized: false,
-      memorySize: 4096,
-      windowWidth: 1200,
-      windowHeight: 800,
-    };
+    return await tauriService.getSettings();
   }
 
   async setSettings(settings: Partial<AppSettings>): Promise<boolean> {
-    await this.simulateDelay();
-    return true;
+    const currentSettings = await this.getSettings();
+    const newSettings = { ...currentSettings, ...settings };
+    return await tauriService.setSettings(newSettings);
   }
 
   async searchMods(query: string, platform = 'curseforge'): Promise<ModInfo[]> {
-    await this.simulateDelay();
+    // Tauri implementation would search mods
     return [
       {
         id: 'mod1',
@@ -299,7 +250,6 @@ class MockIPCService implements IPCService {
   }
 
   async getModInfo(id: string): Promise<ModInfo> {
-    await this.simulateDelay();
     const mods = await this.searchMods('');
     const mod = mods.find(m => m.id === id);
     if (!mod) {
@@ -309,24 +259,17 @@ class MockIPCService implements IPCService {
   }
 
   async installMod(id: string): Promise<boolean> {
-    await this.simulateDelay();
+    // Tauri implementation would install mod
     return true;
   }
 
   async uninstallMod(id: string): Promise<boolean> {
-    await this.simulateDelay();
+    // Tauri implementation would uninstall mod
     return true;
   }
 
   async getSystemInfo(): Promise<SystemInfo> {
-    await this.simulateDelay();
-    return {
-      osName: 'Linux',
-      osVersion: '6.12.8+',
-      architecture: 'x86_64',
-      javaVersion: '17.0.2',
-      launcherVersion: '10.0.0',
-    };
+    return await tauriService.getSystemInfo();
   }
 
   onEvent(callback: (event: any) => void): void {
@@ -349,14 +292,10 @@ class MockIPCService implements IPCService {
       }
     });
   }
-
-  private async simulateDelay(): Promise<void> {
-    await new Promise(resolve => setTimeout(resolve, Math.random() * 500 + 100));
-  }
 }
 
 // Create singleton instance
-export const ipcService = new MockIPCService();
+export const ipcService = new TauriIPCService();
 
 // Store for managing IPC service state
 interface IPCStore {

@@ -1,15 +1,15 @@
 {
   "name": "prism-launcher-frontend",
   "version": "1.0.0",
-  "description": "Modern FluentUI desktop frontend for Prism Launcher",
-  "main": "dist/main.js",
+  "description": "Modern FluentUI desktop frontend for Prism Launcher with Tauri",
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "electron": "electron .",
-    "electron-dev": "concurrently \"npm run dev\" \"wait-on http://localhost:5173 && electron .\"",
-    "electron-build": "npm run build && electron-builder",
+    "tauri": "tauri",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "type-check": "tsc --noEmit"
   },
@@ -27,7 +27,8 @@
     "react-hot-toast": "^2.4.0",
     "react-query": "^3.39.0",
     "framer-motion": "^10.16.0",
-    "lucide-react": "^0.294.0"
+    "lucide-react": "^0.294.0",
+    "@tauri-apps/api": "^1.5.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.0",
@@ -35,35 +36,15 @@
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
     "@vitejs/plugin-react": "^4.0.0",
-    "concurrently": "^8.2.0",
-    "electron": "^27.0.0",
-    "electron-builder": "^24.6.0",
     "eslint": "^8.45.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.0",
     "typescript": "^5.0.0",
     "vite": "^4.4.0",
-    "vite-plugin-electron": "^0.11.0",
-    "wait-on": "^7.0.0"
+    "@tauri-apps/cli": "^1.5.0"
   },
-  "build": {
-    "appId": "com.prismlauncher.frontend",
-    "productName": "Prism Launcher",
-    "directories": {
-      "output": "dist-electron"
-    },
-    "files": [
-      "dist/**/*",
-      "node_modules/**/*"
-    ],
-    "mac": {
-      "category": "public.app-category.games"
-    },
-    "win": {
-      "target": "nsis"
-    },
-    "linux": {
-      "target": "AppImage"
-    }
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
   }
 }

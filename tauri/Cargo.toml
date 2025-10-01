@@ -1,0 +1,54 @@
+[package]
+name = "prism-launcher"
+version = "0.1.0"
+description = "Modern Minecraft launcher with Tauri"
+authors = ["PrismLauncher Team"]
+license = "GPL-3.0"
+repository = "https://github.com/PrismLauncher/PrismLauncher"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[build-dependencies]
+tauri-build = { version = "1.5", features = [] }
+
+[dependencies]
+tauri = { version = "1.5", features = ["api-all"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tokio = { version = "1.0", features = ["full"] }
+reqwest = { version = "0.11", features = ["json"] }
+uuid = { version = "1.0", features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+dirs = "5.0"
+walkdir = "2.0"
+zip = "0.6"
+sha2 = "0.10"
+base64 = "0.21"
+url = "2.4"
+anyhow = "1.0"
+thiserror = "1.0"
+log = "0.4"
+env_logger = "0.10"
+
+# IPC通信相关
+ipc-channel = "0.18"
+crossbeam-channel = "0.5"
+
+# 文件系统操作
+fs_extra = "1.3"
+tempfile = "3.8"
+
+# 系统信息
+sysinfo = "0.29"
+
+# 网络请求
+ureq = { version = "2.7", features = ["json"] }
+
+[features]
+# 默认功能
+default = ["custom-protocol"]
+# 自定义协议
+custom-protocol = ["tauri/custom-protocol"]
+# 开发模式
+dev = ["tauri/devtools"]

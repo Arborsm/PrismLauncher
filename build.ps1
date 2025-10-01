@@ -3,7 +3,7 @@
 
 param(
     [Parameter(Position=0)]
-    [ValidateSet("core", "frontend", "electron", "all", "clean", "test", "help")]
+    [ValidateSet("tauri", "frontend", "app", "all", "clean", "test", "help")]
     [string]$Target = "all"
 )
 
@@ -41,16 +41,30 @@ function Write-LogError {
 function Test-Dependencies {
     Write-LogInfo "检查构建依赖..."
     
-    # 检查CMake
+    # 检查Rust
     try {
-        $cmakeVersion = & cmake --version 2>$null | Select-Object -First 1
+        $rustVersion = & rustc --version 2>$null
         if ($LASTEXITCODE -ne 0) {
-            throw "CMake not found"
+            throw "Rust not found"
         }
-        Write-LogInfo "CMake: $cmakeVersion"
+        Write-LogInfo "Rust: $rustVersion"
     }
     catch {
-        Write-LogError "CMake未安装，请先安装CMake"
+        Write-LogError "Rust未安装，请先安装Rust"
+        Write-LogInfo "访问 https://rustup.rs/ 安装Rust"
+        exit 1
+    }
+    
+    # 检查Cargo
+    try {
+        $cargoVersion = & cargo --version 2>$null
+        if ($LASTEXITCODE -ne 0) {
+            throw "Cargo not found"
+        }
+        Write-LogInfo "Cargo: $cargoVersion"
+    }
+    catch {
+        Write-LogError "Cargo未安装，请先安装Cargo"
         exit 1
     }
     
@@ -80,53 +94,51 @@ function Test-Dependencies {
         exit 1
     }
     
-    # 检查Visual Studio Build Tools
-    $vsWhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
-    if (Test-Path $vsWhere) {
-        $vsInstall = & $vsWhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 2>$null
-        if ($vsInstall) {
-            Write-LogInfo "Visual Studio Build Tools: 已安装"
+    # 检查Tauri CLI
+    try {
+        $tauriVersion = & npx tauri --version 2>$null
+        if ($LASTEXITCODE -ne 0) {
+            Write-LogWarning "Tauri CLI未安装，将自动安装"
         } else {
-            Write-LogWarning "Visual Studio Build Tools未找到，请确保已安装"
+            Write-LogInfo "Tauri CLI: $tauriVersion"
         }
-    } else {
-        Write-LogWarning "Visual Studio Installer未找到"
+    }
+    catch {
+        Write-LogWarning "Tauri CLI未安装，将自动安装"
     }
     
     Write-LogSuccess "所有依赖检查通过"
 }
 
-# 构建Core后端
-function Build-Core {
-    Write-LogInfo "开始构建Core后端..."
+# 构建Tauri后端
+function Build-Tauri {
+    Write-LogInfo "开始构建Tauri后端..."
     
-    # 创建构建目录
-    $buildDir = "build\core"
-    if (!(Test-Path $buildDir)) {
-        New-Item -ItemType Directory -Path $buildDir -Force | Out-Null
-    }
-    
-    Push-Location $buildDir
+    Push-Location "tauri"
     
     try {
-        # 配置CMake
-        Write-LogInfo "配置CMake..."
-        & cmake ..\..\core -DCMAKE_BUILD_TYPE=Release -G "Visual Studio 17 2022" -A x64
+        # 安装Tauri CLI（如果需要）
+        Write-LogInfo "检查Tauri CLI..."
+        $tauriCheck = & npx tauri --version 2>$null
         if ($LASTEXITCODE -ne 0) {
-            throw "CMake配置失败"
+            Write-LogInfo "安装Tauri CLI..."
+            & npm install -g @tauri-apps/cli
+            if ($LASTEXITCODE -ne 0) {
+                throw "Tauri CLI安装失败"
+            }
         }
         
-        # 编译
-        Write-LogInfo "编译Core后端..."
-        & cmake --build . --config Release --parallel
+        # 构建Tauri应用
+        Write-LogInfo "构建Tauri应用..."
+        & npx tauri build
         if ($LASTEXITCODE -ne 0) {
-            throw "编译失败"
+            throw "Tauri构建失败"
         }
         
-        Write-LogSuccess "Core后端构建完成"
+        Write-LogSuccess "Tauri后端构建完成"
     }
     catch {
-        Write-LogError "Core后端构建失败: $_"
+        Write-LogError "Tauri后端构建失败: $_"
         exit 1
     }
     finally {
@@ -166,24 +178,51 @@ function Build-Frontend {
     }
 }
 
-# 构建Electron应用
-function Build-Electron {
-    Write-LogInfo "开始构建Electron应用..."
+# 构建Tauri应用
+function Build-TauriApp {
+    Write-LogInfo "开始构建Tauri应用..."
     
     Push-Location "frontend"
     
     try {
-        # 构建Electron应用
-        Write-LogInfo "构建Electron应用..."
-        & npm run electron-build
+        # 安装依赖
+        Write-LogInfo "安装前端依赖..."
+        & npm install
         if ($LASTEXITCODE -ne 0) {
-            throw "Electron构建失败"
+            throw "前端依赖安装失败"
         }
         
-        Write-LogSuccess "Electron应用构建完成"
+        # 构建前端
+        Write-LogInfo "构建前端..."
+        & npm run build
+        if ($LASTEXITCODE -ne 0) {
+            throw "前端构建失败"
+        }
+        
+        Write-LogSuccess "前端构建完成"
     }
     catch {
-        Write-LogError "Electron构建失败: $_"
+        Write-LogError "前端构建失败: $_"
+        exit 1
+    }
+    finally {
+        Pop-Location
+    }
+    
+    # 构建Tauri应用
+    Write-LogInfo "构建Tauri应用..."
+    Push-Location "tauri"
+    
+    try {
+        & npx tauri build
+        if ($LASTEXITCODE -ne 0) {
+            throw "Tauri应用构建失败"
+        }
+        
+        Write-LogSuccess "Tauri应用构建完成"
+    }
+    catch {
+        Write-LogError "Tauri应用构建失败: $_"
         exit 1
     }
     finally {
@@ -195,21 +234,16 @@ function Build-Electron {
 function Clear-Build {
     Write-LogInfo "清理构建文件..."
     
-    # 清理Core构建
-    if (Test-Path "build") {
-        Remove-Item -Path "build" -Recurse -Force
-        Write-LogInfo "已清理Core构建文件"
+    # 清理Tauri构建
+    if (Test-Path "tauri\target") {
+        Remove-Item -Path "tauri\target" -Recurse -Force
+        Write-LogInfo "已清理Tauri构建文件"
     }
     
     # 清理前端构建
     if (Test-Path "frontend\dist") {
         Remove-Item -Path "frontend\dist" -Recurse -Force
         Write-LogInfo "已清理前端构建文件"
-    }
-    
-    if (Test-Path "frontend\dist-electron") {
-        Remove-Item -Path "frontend\dist-electron" -Recurse -Force
-        Write-LogInfo "已清理Electron构建文件"
     }
     
     # 清理node_modules
@@ -260,9 +294,9 @@ function Show-Help {
     Write-Host "用法: .\build.ps1 [选项]" -ForegroundColor $Colors.White
     Write-Host ""
     Write-Host "选项:" -ForegroundColor $Colors.White
-    Write-Host "  core        构建Core后端" -ForegroundColor $Colors.White
+    Write-Host "  tauri       构建Tauri后端" -ForegroundColor $Colors.White
     Write-Host "  frontend    构建前端" -ForegroundColor $Colors.White
-    Write-Host "  electron    构建Electron应用" -ForegroundColor $Colors.White
+    Write-Host "  app         构建Tauri应用" -ForegroundColor $Colors.White
     Write-Host "  all         构建所有组件（默认）" -ForegroundColor $Colors.White
     Write-Host "  clean       清理构建文件" -ForegroundColor $Colors.White
     Write-Host "  test        运行测试" -ForegroundColor $Colors.White
@@ -270,11 +304,12 @@ function Show-Help {
     Write-Host ""
     Write-Host "示例:" -ForegroundColor $Colors.White
     Write-Host "  .\build.ps1              # 构建所有组件" -ForegroundColor $Colors.White
-    Write-Host "  .\build.ps1 core         # 只构建Core后端" -ForegroundColor $Colors.White
-    Write-Host "  .\build.ps1 frontend    # 只构建前端" -ForegroundColor $Colors.White
+    Write-Host "  .\build.ps1 tauri       # 只构建Tauri后端" -ForegroundColor $Colors.White
+    Write-Host "  .\build.ps1 frontend   # 只构建前端" -ForegroundColor $Colors.White
+    Write-Host "  .\build.ps1 app         # 构建Tauri应用" -ForegroundColor $Colors.White
     Write-Host "  .\build.ps1 clean       # 清理构建文件" -ForegroundColor $Colors.White
     Write-Host ""
-    Write-Host "注意: 请确保在PowerShell中运行此脚本" -ForegroundColor $Colors.Yellow
+    Write-Host "注意: 请确保已安装Rust和Node.js" -ForegroundColor $Colors.Yellow
 }
 
 # 主函数
@@ -289,19 +324,18 @@ function Main {
     
     # 根据目标执行构建
     switch ($Target) {
-        "core" {
-            Build-Core
+        "tauri" {
+            Build-Tauri
         }
         "frontend" {
             Build-Frontend
         }
-        "electron" {
-            Build-Electron
+        "app" {
+            Build-TauriApp
         }
         "all" {
-            Build-Core
             Build-Frontend
-            Build-Electron
+            Build-TauriApp
         }
         "clean" {
             Clear-Build

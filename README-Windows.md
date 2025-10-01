@@ -1,6 +1,6 @@
-# Prism Launcher Windows 环境指南
+# Prism Launcher Windows 环境指南 (Tauri版本)
 
-这是专门为Windows环境准备的Prism Launcher现代化架构项目指南。
+这是专门为Windows环境准备的Prism Launcher现代化架构项目指南，使用Tauri框架构建。
 
 ## 🚀 快速开始
 
@@ -13,9 +13,9 @@ setup-windows.bat
 ```
 
 **手动设置**：
-1. 安装 [Visual Studio 2022](https://visualstudio.microsoft.com/downloads/) 或 [Build Tools](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022)
+1. 安装 [Rust](https://rustup.rs/) (最新稳定版)
 2. 安装 [Node.js](https://nodejs.org/) (推荐 LTS 版本)
-3. 安装 [CMake](https://cmake.org/download/)
+3. 安装 [Visual Studio 2022](https://visualstudio.microsoft.com/downloads/) 或 [Build Tools](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022) (Rust需要)
 4. 安装 [Git](https://git-scm.com/download/win)
 
 ### 2. 构建项目
@@ -25,14 +25,14 @@ setup-windows.bat
 # 构建所有组件
 build.bat all
 
-# 只构建Core后端
-build.bat core
+# 只构建Tauri后端
+build.bat tauri
 
 # 只构建前端
 build.bat frontend
 
-# 只构建Electron应用
-build.bat electron
+# 构建Tauri应用
+build.bat app
 
 # 清理构建文件
 build.bat clean
@@ -43,14 +43,14 @@ build.bat clean
 # 构建所有组件
 .\build.ps1 all
 
-# 只构建Core后端
-.\build.ps1 core
+# 只构建Tauri后端
+.\build.ps1 tauri
 
 # 只构建前端
 .\build.ps1 frontend
 
-# 只构建Electron应用
-.\build.ps1 electron
+# 构建Tauri应用
+.\build.ps1 app
 
 # 清理构建文件
 .\build.ps1 clean
@@ -58,12 +58,12 @@ build.bat clean
 
 ### 3. 开发模式
 
-**启动前端开发服务器**：
+**启动Tauri开发服务器**：
 ```cmd
 run-dev.bat
 ```
 
-**启动Electron应用**：
+**启动Tauri应用**：
 ```cmd
 run-electron.bat
 ```
@@ -84,12 +84,23 @@ run-electron.bat
 
 ## 🛠️ 开发环境
 
+### Rust 环境
+
+1. **安装Rust**：
+   - 访问 [rustup.rs](https://rustup.rs/) 安装Rust
+   - 或使用Chocolatey: `choco install rust`
+
+2. **验证安装**：
+   ```cmd
+   rustc --version
+   cargo --version
+   ```
+
 ### Visual Studio 设置
 
 1. **安装组件**：
    - MSVC v143 - VS 2022 C++ x64/x86 构建工具
    - Windows 10/11 SDK
-   - CMake 工具
 
 2. **开发者命令提示符**：
    ```cmd
@@ -109,25 +120,13 @@ run-electron.bat
    npm --version
    ```
 
-### CMake 设置
-
-1. **版本要求**：
-   - CMake 3.22 或更高
-
-2. **验证安装**：
-   ```cmd
-   cmake --version
-   ```
-
 ## 🔧 构建说明
 
-### Core后端构建
+### Tauri后端构建
 
 ```cmd
-# 在Developer Command Prompt中运行
-cd build\core
-cmake ..\..\core -DCMAKE_BUILD_TYPE=Release -G "Visual Studio 17 2022" -A x64
-cmake --build . --config Release --parallel
+cd tauri
+npx tauri build
 ```
 
 ### 前端构建
@@ -138,23 +137,23 @@ npm install
 npm run build
 ```
 
-### Electron应用构建
+### Tauri应用构建
 
 ```cmd
 cd frontend
-npm run electron-build
+npm run tauri:build
 ```
 
 ## 🐛 常见问题
 
-### 1. CMake配置失败
+### 1. Rust编译失败
 
-**问题**：CMake找不到Visual Studio
+**问题**：Rust找不到Visual Studio Build Tools
 **解决方案**：
 ```cmd
 # 确保在Developer Command Prompt中运行
-# 或手动指定生成器
-cmake -G "Visual Studio 17 2022" -A x64
+# 或安装Visual Studio Build Tools
+choco install visualstudio2022buildtools
 ```
 
 ### 2. Node.js模块安装失败
@@ -170,17 +169,16 @@ rmdir /s /q node_modules
 npm install
 ```
 
-### 3. Electron构建失败
+### 3. Tauri构建失败
 
-**问题**：Electron下载失败
+**问题**：Tauri CLI未安装
 **解决方案**：
 ```cmd
-# 设置Electron镜像
-npm config set electron_mirror https://npmmirror.com/mirrors/electron/
+# 安装Tauri CLI
+npm install -g @tauri-apps/cli
 
-# 或使用cnpm
-npm install -g cnpm --registry=https://registry.npmmirror.com
-cnpm install
+# 或使用npx
+npx tauri build
 ```
 
 ### 4. 权限问题
@@ -197,9 +195,9 @@ cnpm install
 ├── build.bat              # Windows批处理构建脚本
 ├── build.ps1              # PowerShell构建脚本
 ├── setup-windows.bat      # Windows环境设置脚本
-├── run-dev.bat            # 开发服务器启动脚本
-├── run-electron.bat       # Electron应用启动脚本
-├── core/                  # Core后端源码
+├── run-dev.bat            # Tauri开发服务器启动脚本
+├── run-electron.bat       # Tauri应用启动脚本
+├── tauri/                 # Tauri后端源码
 ├── frontend/              # 前端源码
 └── README-Windows.md      # Windows环境指南
 ```
@@ -212,26 +210,26 @@ cnpm install
 # 构建所有组件
 build.bat all
 
-# 运行Electron应用
+# 运行Tauri应用
 run-electron.bat
 ```
 
 ### 2. 开发服务器
 
 ```cmd
-# 启动前端开发服务器
+# 启动Tauri开发服务器
 run-dev.bat
 
-# 在浏览器中访问 http://localhost:5173
+# 在浏览器中访问 http://localhost:1420
 ```
 
 ### 3. 生产构建
 
 ```cmd
 # 构建生产版本
-build.bat electron
+build.bat app
 
-# 输出文件在 frontend\dist-electron\ 目录
+# 输出文件在 tauri\target\release\ 目录
 ```
 
 ## 📞 技术支持
@@ -250,12 +248,21 @@ build.bat electron
 3. **网络连接**：构建过程需要下载依赖包
 4. **磁盘空间**：确保有足够的磁盘空间用于构建
 5. **路径长度**：避免使用过长的文件路径
+6. **Rust工具链**：首次构建可能需要下载Rust工具链
 
 ## 🎯 下一步
 
 构建完成后，您可以：
 
-1. 运行 `run-electron.bat` 启动桌面应用
-2. 运行 `run-dev.bat` 启动开发服务器
+1. 运行 `run-electron.bat` 启动Tauri桌面应用
+2. 运行 `run-dev.bat` 启动Tauri开发服务器
 3. 查看 `README.md` 了解项目架构
 4. 开始自定义和扩展功能
+
+## 🔗 Tauri优势
+
+- **轻量级**：比Electron更小的应用体积
+- **性能更好**：Rust后端提供更好的性能
+- **安全性**：更好的安全模型
+- **跨平台**：支持Windows、macOS、Linux
+- **现代化**：使用最新的Web技术

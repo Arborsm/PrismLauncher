@@ -1,15 +1,31 @@
 @echo off
-REM Windows Electron应用启动脚本
+REM Windows Tauri应用启动脚本
 
 setlocal enabledelayedexpansion
 
 echo ========================================
-echo Prism Launcher Electron应用启动
+echo Prism Launcher Tauri应用启动
 echo ========================================
 echo.
 
 REM 检查依赖
-echo [INFO] 检查Electron环境...
+echo [INFO] 检查Tauri环境...
+
+REM 检查Rust
+rustc --version >nul 2>&1
+if errorlevel 1 (
+    echo [ERROR] Rust未安装，请先运行setup-windows.bat
+    pause
+    exit /b 1
+)
+
+REM 检查Cargo
+cargo --version >nul 2>&1
+if errorlevel 1 (
+    echo [ERROR] Cargo未安装，请先运行setup-windows.bat
+    pause
+    exit /b 1
+)
 
 REM 检查Node.js
 node --version >nul 2>&1
@@ -27,7 +43,7 @@ if errorlevel 1 (
     exit /b 1
 )
 
-echo [SUCCESS] Electron环境检查通过
+echo [SUCCESS] Tauri环境检查通过
 
 REM 安装前端依赖（如果需要）
 if not exist "frontend\node_modules" (
@@ -42,12 +58,12 @@ if not exist "frontend\node_modules" (
     cd ..
 )
 
-REM 启动Electron应用
-echo [INFO] 启动Electron应用...
+REM 启动Tauri应用
+echo [INFO] 启动Tauri应用...
 echo [INFO] 按 Ctrl+C 停止应用
 echo.
 
 cd frontend
-call npm run electron-dev
+call npm run tauri:dev
 
 pause

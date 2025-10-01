@@ -43,13 +43,13 @@ if not exist "frontend\node_modules" (
     cd ..
 )
 
-REM 启动开发服务器
-echo [INFO] 启动开发服务器...
-echo [INFO] 前端将在 http://localhost:5173 启动
+REM 启动Tauri开发服务器
+echo [INFO] 启动Tauri开发服务器...
+echo [INFO] 前端将在 http://localhost:1420 启动
 echo [INFO] 按 Ctrl+C 停止服务器
 echo.
 
 cd frontend
-call npm run dev
+call npm run tauri:dev
 
 pause
