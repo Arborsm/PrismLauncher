@@ -1,0 +1,21 @@
+<Application
+    x:Class="PrismLauncherWinUI3.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
+            </ResourceDictionary.MergedDictionaries>
+            
+            <!-- 主题颜色 -->
+            <SolidColorBrush x:Key="PrismAccentBrush" Color="#7C3AED"/>
+            <SolidColorBrush x:Key="PrismBackgroundBrush" Color="#1E1E1E"/>
+            <SolidColorBrush x:Key="PrismSurfaceBrush" Color="#2D2D2D"/>
+            <SolidColorBrush x:Key="PrismCardBrush" Color="#3D3D3D"/>
+            
+            <!-- 字体 -->
+            <FontFamily x:Key="PrismFontFamily">Segoe UI Variable</FontFamily>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

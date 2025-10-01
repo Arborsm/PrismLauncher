@@ -1,0 +1,21 @@
+{
+  "name": "prism-launcher-winui3",
+  "version": "1.0.0",
+  "description": "Prism Launcher with modern Windows UI",
+  "main": "index.js",
+  "scripts": {
+    "build": "cmake --build build --config Release",
+    "build-debug": "cmake --build build --config Debug",
+    "configure": "cmake -B build -S .",
+    "clean": "cmake --build build --target clean",
+    "run": "build\\bin\\Release\\PrismLauncherWinUI3.exe"
+  },
+  "keywords": [
+    "minecraft",
+    "launcher",
+    "winui3",
+    "windows"
+  ],
+  "author": "Prism Launcher Team",
+  "license": "GPL-3.0-only"
+}
